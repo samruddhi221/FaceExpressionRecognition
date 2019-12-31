@@ -24,7 +24,7 @@ from keras.regularizers import l1
 from keras.callbacks import EarlyStopping
 import cv2
 
-image = face_recognition.load_image_file("friends2.jpg")
+image = face_recognition.load_image_file("friends.jpg")
 face_locations = face_recognition.face_locations(image)
 
 print(face_locations)
@@ -110,10 +110,12 @@ for face_location in face_locations:
     input_image = cv2.resize(face_crop, dsize=(48, 48), interpolation=cv2.INTER_CUBIC)
     input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
     input_image = np.reshape(input_image, [1, input_image.shape[0], input_image.shape[1], 1])
+    input_image = input_image.astype(np.float32) * 1.0/255.0
     print(input_image.shape)
-    emotion_pred = model_.predict(input_image)
+    emotion_pred = model_.predict_proba(input_image)
     emotion_id = np.argmax(emotion_pred)
-    print(EMOTIONS[emotion_id])
+    probability = np.max(emotion_pred)
+    print("{} P:{}".format(EMOTIONS[emotion_id],probability))
     
 
     # Draw a box around the face

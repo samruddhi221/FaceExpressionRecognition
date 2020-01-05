@@ -23,11 +23,25 @@ from keras import regularizers
 from keras.regularizers import l1
 from keras.callbacks import EarlyStopping
 import cv2
+import argparse
 
 import tensorflow.python.util.deprecation as deprecation
 deprecation._PRINT_DEPRECATION_WARNINGS = False
 
-image = face_recognition.load_image_file("friends2.jpg")
+
+parser = argparse.ArgumentParser(description='Face emotion recognition')
+
+parser.add_argument("--image", dest="image_path", required=False, help="transfer learn from some_model.pth", metavar="MODEL NAME", default="test_images/sameya.JPG")
+
+args = parser.parse_args()
+
+image = face_recognition.load_image_file(args.image_path)
+
+(h,w,c) = image.shape
+
+aspect_ratio = float(w)/float(h)
+
+image = cv2.resize(image, dsize=(1024,int(1024/aspect_ratio) ), interpolation=cv2.INTER_CUBIC) 
 face_locations = face_recognition.face_locations(image)
 
 print(face_locations)

@@ -24,7 +24,10 @@ from keras.regularizers import l1
 from keras.callbacks import EarlyStopping
 import cv2
 
-image = face_recognition.load_image_file("friends.jpg")
+import tensorflow.python.util.deprecation as deprecation
+deprecation._PRINT_DEPRECATION_WARNINGS = False
+
+image = face_recognition.load_image_file("friends2.jpg")
 face_locations = face_recognition.face_locations(image)
 
 print(face_locations)

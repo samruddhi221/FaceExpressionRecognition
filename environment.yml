@@ -1,4 +1,4 @@
-name: base
+name: fer_dev
 channels:
   - anaconda
   - conda-forge

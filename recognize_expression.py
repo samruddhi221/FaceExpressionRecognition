@@ -52,11 +52,17 @@ def baseline_model(drop_rate=0.1, regularization_val=0.0001):
   # Create the model
   model = Sequential()
 
+  model.add(Conv2D(16, kernel_size=(3, 3), activation='relu',
+                   kernel_regularizer=regularizers.l2(regularization_val), 
+                   padding='same',
+                   input_shape=(48,48,1)))
+
   model.add(Conv2D(32, kernel_size=(3, 3), activation='relu',
                    kernel_regularizer=regularizers.l2(regularization_val), 
                    padding='same',
                    input_shape=(48,48,1)))
-  # model.add(BatchNormalization())
+  model.add(BatchNormalization())
+  model.add(Dropout(drop_rate))
 
   model.add(Conv2D(64, kernel_size=(3, 3), activation='relu',
                    kernel_regularizer=regularizers.l2(regularization_val), 
@@ -64,10 +70,20 @@ def baseline_model(drop_rate=0.1, regularization_val=0.0001):
   # model.add(BatchNormalization())
   model.add(MaxPooling2D(pool_size=(2, 2)))
 
-  model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', 
+  model.add(Conv2D(64, kernel_size=(1, 1), activation='relu', 
                    kernel_regularizer=regularizers.l2(regularization_val), 
                    padding='same'))
   # model.add(BatchNormalization())
+  model.add(MaxPooling2D(pool_size=(2, 2)))
+
+  model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', 
+                   kernel_regularizer=regularizers.l2(regularization_val), 
+                   padding='same'))
+  model.add(MaxPooling2D(pool_size=(2, 2)))
+
+  model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', 
+                   kernel_regularizer=regularizers.l2(regularization_val), 
+                   padding='same'))
   model.add(MaxPooling2D(pool_size=(2, 2)))
 
   model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', 
@@ -83,33 +99,37 @@ def baseline_model(drop_rate=0.1, regularization_val=0.0001):
   # model.add(MaxPooling2D(pool_size=(2, 2)))
 
 
-  model.add(Conv2D(7, kernel_size=(1, 1), activation='relu', 
+  model.add(Conv2D(256, kernel_size=(1, 1), activation='relu',                    #changed 7 to 256
                    kernel_regularizer=regularizers.l2(regularization_val), 
                    padding='same'))
   # model.add(BatchNormalization())
 
-  model.add(Conv2D(7, kernel_size=(4, 4), activation='relu', 
+  model.add(MaxPooling2D(pool_size=(1, 1)))
+
+  model.add(Conv2D(7, kernel_size=(4, 4), activation='relu',                      
                    kernel_regularizer=regularizers.l2(regularization_val), 
                    padding='same'))
   # model.add(BatchNormalization())
 
   model.add(Flatten())
 
-  # model.add(Dense(4096, activation='relu'))
-  # model.add(Dropout(drop_rate))
-  # model.add(Dense(4096, activation='relu'))
-  # model.add(Dropout(drop_rate))
-
+  model.add(Dense(256, activation='relu'))
+  model.add(Dropout(drop_rate))
+  model.add(Dense(128, activation='relu'))  #new1
+  model.add(Dropout(drop_rate))
+  model.add(Dense(64, activation='relu'))  #new1
+  model.add(Dropout(drop_rate))
   model.add(Dense(7, activation='relu'))
 
   model.add(Activation("softmax"))
 
   model.summary()
-
+  metrics = ['categorical_accuracy']
+  adam = Adam(lr = 1e-3)
+  model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=metrics)
   return model
 
-
-model_ = baseline_model(drop_rate=0.0, regularization_val=0.0)
+model_ = baseline_model(drop_rate=0.0, regularization_val=0.000001)
 model_.load_weights("trained_model.h5")
 
 EMOTIONS = {0:'Angry', 1:'Disgust', 2:'Fear', 3:'Happy', 4:'Sad', 5:'Surprise', 6:'Neutral'}
